@@ -1,7 +1,21 @@
 const fsPromises = require('fs/promises');
 const path = require('path');
 
-fsPromises.mkdir(path.join(__dirname, 'files-copy'), {recursive: true});
+async function reloadDir() {
+  await fsPromises.rm(path.join(__dirname, 'files-copy'), { recursive: true, force: true }, (err) => {
+    if (err) {
+      throw err;
+    }    
+  });
+
+  await fsPromises.mkdir(path.join(__dirname, 'files-copy'), {recursive: true} , (error) => {
+    if (error) {
+      throw error;
+    }
+  });
+
+  await copyDir();
+}
 
 async function copyDir() {
     const files = await fsPromises.readdir(path.join(__dirname,'files'),{withFileTypes: true});
@@ -15,7 +29,7 @@ async function copyDir() {
     }
 }
 try {
-  copyDir();
+  reloadDir();
 } catch (err) {
   console.error(err);
 }
